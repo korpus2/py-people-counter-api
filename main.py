@@ -1,7 +1,12 @@
-import cv2
-from flask import Flask
-from flask_restful import Resource, Api
+import ssl
+import urllib.request
 
+import cv2
+import numpy as np
+from flask import Flask
+from flask_restful import Resource, Api, request
+
+ssl._create_default_https_context = ssl._create_unverified_context
 app = Flask(__name__)
 api = Api(app)
 
@@ -15,7 +20,16 @@ class PeopleCounter(Resource):
         print(type(img))
         print(img.shape)
         boxes, weights = hog.detectMultiScale(img, winStride=(2, 2))
+        return {"count": len(boxes)}
 
+
+class PeopleCounterParams(Resource):
+    def get(self):
+        path = request.args["url"]
+        req = urllib.request.urlopen(path)
+        arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
+        img = cv2.imdecode(arr, -1)
+        boxes, weights = hog.detectMultiScale(img, winStride=(2, 2))
         return {"count": len(boxes)}
 
 
@@ -25,6 +39,9 @@ class HelloWorld(Resource):
 
 
 api.add_resource(PeopleCounter, "/")
+api.add_resource(PeopleCounterParams, "/web/")
 api.add_resource(HelloWorld, "/test")
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=2137)
