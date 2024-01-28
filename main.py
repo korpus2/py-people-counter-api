@@ -15,7 +15,7 @@ api = Api(app)
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
-UPLOAD_FOLDER = "/Users/krzysztofkorus/Desktop/Studia/Cloudy/py-people-counter-api/"
+TMP_DIR = "/Users/krzysztofkorus/Desktop/Studia/Cloudy/py-people-counter-api/"
 
 
 class PeopleCounter(Resource):
@@ -42,7 +42,7 @@ class PeopleCounterUpload(Resource):
     def post(self):
         file = request.files["file"]
         filename = secure_filename(file.filename)
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        filepath = os.path.join(TMP_DIR, filename)
         file.save(filepath)
         img = cv2.imread(filepath)
         boxes, weights = hog.detectMultiScale(img, winStride=(2, 2))
