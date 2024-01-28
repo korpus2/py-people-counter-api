@@ -14,7 +14,7 @@ class PeopleCounter(Resource):
         img = cv2.imread("images/dworzecWaw.jpeg")
         print(type(img))
         print(img.shape)
-        boxes, weights = hog.detectMultiScale(img, winStride=(8, 8))
+        boxes, weights = hog.detectMultiScale(img, winStride=(2, 2))
 
         return {"count": len(boxes)}
 
