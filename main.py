@@ -23,6 +23,7 @@ class PeopleCounter(Resource):
         return {"count": len(boxes)}
 
 
+# Example: /web/?url=https://2.bp.blogspot.com/-0p7_ozfPi-4/VRx5c91ajlI/AAAAAAAABm0/R-uZ5ra4BjM/s1600/happy-crowd.jpg
 class PeopleCounterParams(Resource):
     def get(self):
         path = request.args["url"]
