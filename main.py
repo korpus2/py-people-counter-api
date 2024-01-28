@@ -1,3 +1,4 @@
+import os.path
 import ssl
 import urllib.request
 
@@ -5,6 +6,7 @@ import cv2
 import numpy as np
 from flask import Flask
 from flask_restful import Resource, Api, request
+from werkzeug.utils import secure_filename
 
 ssl._create_default_https_context = ssl._create_unverified_context
 app = Flask(__name__)
@@ -12,6 +14,8 @@ api = Api(app)
 
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+
+UPLOAD_FOLDER = "/Users/krzysztofkorus/Desktop/Studia/Cloudy/py-people-counter-api/"
 
 
 class PeopleCounter(Resource):
@@ -34,6 +38,18 @@ class PeopleCounterParams(Resource):
         return {"count": len(boxes)}
 
 
+class PeopleCounterUpload(Resource):
+    def post(self):
+        file = request.files["file"]
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(filepath)
+        img = cv2.imread(filepath)
+        boxes, weights = hog.detectMultiScale(img, winStride=(2, 2))
+        os.remove(filepath)
+        return {"count": len(boxes)}
+
+
 class HelloWorld(Resource):
     def get(self):
         return {"hello": "world"}
@@ -41,6 +57,7 @@ class HelloWorld(Resource):
 
 api.add_resource(PeopleCounter, "/")
 api.add_resource(PeopleCounterParams, "/web/")
+api.add_resource(PeopleCounterUpload, "/upload/")
 api.add_resource(HelloWorld, "/test")
 
 
